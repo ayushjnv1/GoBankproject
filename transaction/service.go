@@ -8,7 +8,7 @@ import (
 
 
 type Service interface{
-	Amounttransection(ctx context.Context,amount int,creditAcc string,debitAcc string)(amountRem int,err error)	
+	Amounttransection(ctx context.Context,amount int,creditAcc string,debitAcc string,uid string)(amountRem int,err error)	
 	AmmountWithdraw(ctx context.Context,amount int,debitAcc string )(amountRem int ,err error)
 	AmmountDeposit(ctx context.Context,amount int,creditAcc string)(amountR int,err error)
 }
@@ -17,14 +17,22 @@ type transactionService struct{
 	db db.Storer
 }
 
-func (ts *transactionService)Amounttransection(ctx context.Context,amount int,creditAcc string,debitAcc string)(amountRem int, err error){
-	isSufficient ,err := IsAmountSufficient(ctx,amount,debitAcc,ts.db)   
+func (ts *transactionService)Amounttransection(ctx context.Context,amount int,creditAcc string,debitAcc string,uid string)(amountRem int, err error){
+	isSufficient ,err := IsAmountSufficient(ctx,amount,debitAcc,ts.db)   	
 	if err!=nil{
 		return 
 	}
 	if !isSufficient{
         return amountRem,ErrInSufficientAmmount
 	}  
+	
+	isAllow,err := IsLoginUserCustomer(ctx,uid,debitAcc,ts.db)
+	if err!=nil{
+		return amountRem,err
+	}
+	if !isAllow{
+		return amountRem,ErrUnAuthorize
+	}
 
 	err = ts.db.Amounttransection(ctx,amount,creditAcc,debitAcc)	
 	if err!= nil{
@@ -33,6 +41,7 @@ func (ts *transactionService)Amounttransection(ctx context.Context,amount int,cr
 	amountRem ,err = ts.db.GetammountAcc(ctx,debitAcc)		
 	return amountRem,err
 }
+
 
 func( ts *transactionService)AmmountWithdraw(ctx context.Context,amount int,debitAcc string )(amountRem int,err error){
     isSufficient ,err := IsAmountSufficient(ctx,amount,debitAcc,ts.db)   

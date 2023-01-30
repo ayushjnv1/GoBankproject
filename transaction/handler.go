@@ -51,7 +51,8 @@ func Amounttransection(service Service) http.HandlerFunc{
 			api.Error(w,http.StatusBadRequest,api.Response{Message: err.Error()})
 			return
 		}
-		amount,err := service.Amounttransection(r.Context(),transReq.Amount,transReq.CreditAcc,transReq.DebitAcc)
+		id := r.Header.Get("id")
+		amount,err := service.Amounttransection(r.Context(),transReq.Amount,transReq.CreditAcc,transReq.DebitAcc,id)
 		if err!=nil{
 			api.Error(w,http.StatusBadRequest,api.Response{Message: err.Error()})
 			return
