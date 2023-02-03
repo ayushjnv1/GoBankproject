@@ -8,12 +8,12 @@ import (
 	"github.com/urfave/negroni"
 )
 
-func StartAPIServer(){
+func StartAPIServer() {
 	port := config.AppPort()
 	server := negroni.Classic()
-    dependency := initDependency()
-	router := initRouter(dependency) 
+	dependency := initDependency()
+	router := initRouter(dependency)
 	server.UseHandler(router)
-	addr := fmt.Sprintf(":%s", strconv.Itoa(port))	
+	addr := fmt.Sprintf(":%s", strconv.Itoa(port))
 	server.Run(addr)
 }

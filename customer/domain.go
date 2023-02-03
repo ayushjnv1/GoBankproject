@@ -1,21 +1,14 @@
 package customer
 
-
-
-type Customer struct{
-	Uid string `json:"uid"`
-	Id string  `json:"id"`
-	Amount int `json:"amount"`
+type Customer struct {
+	Userid  string `json:"uid"`
+	ID      string `json:"id"`
+	Balance int    `json:"amount"`
 }
-type CustomerRes struct{
-	Cus Customer `json:"cus"`
-	Message string `josn:"message"`
+type CustomerRes struct {
+	CustomerInfo Customer `json:"cus"`
+	Message      string   `json:"message"`
 }
-type CutomerCreate struct{	
-	Uid string `json:"uid"`	
+type CutomerCreate struct {
+	Userid string `json:"uid"`
 }
-
-func ValidateCustomer(cus CutomerCreate){
-
-}
-

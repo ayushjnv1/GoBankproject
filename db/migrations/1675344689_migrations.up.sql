@@ -21,5 +21,5 @@ CREATE TABLE transaction(
     cid_credit VARCHAR(52) REFERENCES id(customer),
     cid_debit VARCHAR(52) REFERENCES id(customer),
     type VARCHAR(20),
-    tran_at TIMESTAMP
+    transaction_at varchar(100) not null
     );    

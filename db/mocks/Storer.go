@@ -14,6 +14,29 @@ type Storer struct {
 	mock.Mock
 }
 
+// AllTransactionList provides a mock function with given fields: ctx
+func (_m *Storer) AllTransactionList(ctx context.Context) ([]db.TransactionStruct, error) {
+	ret := _m.Called(ctx)
+
+	var r0 []db.TransactionStruct
+	if rf, ok := ret.Get(0).(func(context.Context) []db.TransactionStruct); ok {
+		r0 = rf(ctx)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.TransactionStruct)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // AmmountDeposit provides a mock function with given fields: ctx, cid, amount
 func (_m *Storer) AmmountDeposit(ctx context.Context, cid string, amount int) error {
 	ret := _m.Called(ctx, cid, amount)
@@ -42,8 +65,8 @@ func (_m *Storer) AmmountWithdraw(ctx context.Context, cid string, amount int) e
 	return r0
 }
 
-// Amounttransection provides a mock function with given fields: ctx, amount, creditAcc, debitAcc
-func (_m *Storer) Amounttransection(ctx context.Context, amount int, creditAcc string, debitAcc string) error {
+// Amounttransaction provides a mock function with given fields: ctx, amount, creditAcc, debitAcc
+func (_m *Storer) Amounttransaction(ctx context.Context, amount int, creditAcc string, debitAcc string) error {
 	ret := _m.Called(ctx, amount, creditAcc, debitAcc)
 
 	var r0 error
@@ -168,6 +191,27 @@ func (_m *Storer) FindById(ctx context.Context, id string) (db.User, error) {
 	return r0, r1
 }
 
+// GetAccountBalance provides a mock function with given fields: ctx, id
+func (_m *Storer) GetAccountBalance(ctx context.Context, id string) (int, error) {
+	ret := _m.Called(ctx, id)
+
+	var r0 int
+	if rf, ok := ret.Get(0).(func(context.Context, string) int); ok {
+		r0 = rf(ctx, id)
+	} else {
+		r0 = ret.Get(0).(int)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetCustomer provides a mock function with given fields: ctx, cid
 func (_m *Storer) GetCustomer(ctx context.Context, cid string) (db.Customer, error) {
 	ret := _m.Called(ctx, cid)
@@ -182,27 +226,6 @@ func (_m *Storer) GetCustomer(ctx context.Context, cid string) (db.Customer, err
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
 		r1 = rf(ctx, cid)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// GetammountAcc provides a mock function with given fields: ctx, id
-func (_m *Storer) GetammountAcc(ctx context.Context, id string) (int, error) {
-	ret := _m.Called(ctx, id)
-
-	var r0 int
-	if rf, ok := ret.Get(0).(func(context.Context, string) int); ok {
-		r0 = rf(ctx, id)
-	} else {
-		r0 = ret.Get(0).(int)
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
-		r1 = rf(ctx, id)
 	} else {
 		r1 = ret.Error(1)
 	}

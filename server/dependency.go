@@ -9,25 +9,22 @@ import (
 	userpackage "github.com/ayushjnv1/Gobank/user"
 )
 
-
 type Dependency struct {
-	UserService user.Service
-	CustomerService customer.Service
+	UserService        user.Service
+	CustomerService    customer.Service
 	transactionService transaction.Service
-	
 }
 
-func initDependency()(Dependency){
+func initDependency() Dependency {
 	appDb := app.GetDB()
-	db:= db.NewStore(appDb)
+	db := db.NewStore(appDb)
 	user := userpackage.NewUserService(db)
 	customer := customer.NewCustomerService(db)
-	transaction:= transaction.NewTransactionService(db)
-	
+	transaction := transaction.NewTransactionService(db)
+
 	return Dependency{
-		UserService: user,
-		CustomerService: customer,
+		UserService:        user,
+		CustomerService:    customer,
 		transactionService: transaction,
-		
-		};
+	}
 }

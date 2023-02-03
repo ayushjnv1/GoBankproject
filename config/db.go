@@ -7,12 +7,12 @@ import (
 )
 
 type databaseConfig struct {
-	driver          string
-	host            string
-	name            string
-	user            string
-	password        string
-	port            int
+	driver   string
+	host     string
+	name     string
+	user     string
+	password string
+	port     int
 	// maxPoolSize     int
 	// maxOpenCons     int
 	// maxLifeTimeMins int
@@ -44,14 +44,14 @@ func (c databaseConfig) ConnectionURL() string {
 // }
 
 func newDatabaseConfig() databaseConfig {
-	
+
 	return databaseConfig{
-		driver:          readEnvString("DB_DRIVER"),
-		host:            readEnvString("DB_HOST"),
-		name:            readEnvString("DB_NAME"),
-		user:            readEnvString("DB_USER"),
-		password:        readEnvString("DB_PASSWORD"),
-		port:            readEnvInt("DB_PORT"),
+		driver:   readEnvString("DB_DRIVER"),
+		host:     readEnvString("DB_HOST"),
+		name:     readEnvString("DB_NAME"),
+		user:     readEnvString("DB_USER"),
+		password: readEnvString("DB_PASSWORD"),
+		port:     readEnvInt("DB_PORT"),
 		// maxPoolSize:     readEnvInt("DB_MAX_POOL_SIZE"),
 		// maxOpenCons:     readEnvInt("DB_MAX_OPEN_CONS"),
 		// maxLifeTimeMins: readEnvInt("DB_MAX_LIFE_TIME_MINS"),

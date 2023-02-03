@@ -60,7 +60,7 @@ func CreateMigrationFile(filename string) error {
 	if len(filename) == 0 {
 		return errors.New("filename is not provided")
 	}
-    fmt.Println(filename)
+	fmt.Println(filename)
 	timeStamp := time.Now().Unix()
 	upMigrationFilePath := fmt.Sprintf("%s/%d_%s.up.sql", config.MigrationPath(), timeStamp, filename)
 	downMigrationFilePath := fmt.Sprintf("%s/%d_%s.down.sql", config.MigrationPath(), timeStamp, filename)

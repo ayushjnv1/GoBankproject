@@ -6,8 +6,7 @@ import (
 )
 
 var (
-	db     *sqlx.DB
-
+	db *sqlx.DB
 )
 
 func Init() {
@@ -17,8 +16,6 @@ func Init() {
 		panic(err)
 	}
 }
-
-
 
 func initDB() (err error) {
 	dbConfig := config.Database()
@@ -43,9 +40,7 @@ func GetDB() *sqlx.DB {
 	return db
 }
 
-
-
 func Close() {
-	
+
 	db.Close()
 }

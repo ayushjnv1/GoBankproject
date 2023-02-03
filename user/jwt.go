@@ -16,32 +16,32 @@ type JWTClaim struct {
 }
 
 var jwtKey = []byte("yu78jhe5$r")
-var role_map = map[string]int{"user": 2, "admin": 1,}
+var role_map = map[string]int{"user": 2, "admin": 1}
 
-func Authorize(handler http.HandlerFunc, role int ) http.HandlerFunc{
+func Authorize(handler http.HandlerFunc, role int) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-        tokenString := r.Header.Get("Authorization")
+		tokenString := r.Header.Get("Authorization")
 		claims := JWTClaim{}
 
-		if tokenString!=""{
-		 token,err :=  new(jwt.Parser).ParseWithClaims(tokenString,&claims,func(t *jwt.Token) (interface{}, error) {return jwtKey,nil})
-        if err!=nil{			
-				api.Error(w,http.StatusUnauthorized,api.Response{Message: err.Error()})
-				return 
+		if tokenString != "" {
+			token, err := new(jwt.Parser).ParseWithClaims(tokenString, &claims, func(t *jwt.Token) (interface{}, error) { return jwtKey, nil })
+			if err != nil {
+				api.Error(w, http.StatusUnauthorized, api.Response{Message: err.Error()})
+				return
 			}
-		if !token.Valid{
-			api.Error(w,http.StatusUnauthorized,api.Response{Message: err.Error()})
-		}
-			
-		 if role_map[claims.Role]>role{
-			api.Error(w,http.StatusUnauthorized,api.Response{Message: "You dont have access to perform this action"})	 	
+			if !token.Valid {
+				api.Error(w, http.StatusUnauthorized, api.Response{Message: err.Error()})
+			}
+
+			if role_map[claims.Role] > role {
+				api.Error(w, http.StatusUnauthorized, api.Response{Message: "You dont have access to perform this action"})
+				return
+			}
+			r.Header.Set("id", claims.ID)
+			handler.ServeHTTP(w, r)
 			return
-		 }
-		 r.Header.Set("id",claims.ID);
-	     handler.ServeHTTP(w,r)
-		return
 		}
-		api.Success(w,http.StatusUnauthorized,api.Response{Message: "Please enter token string"})		
+		api.Success(w, http.StatusUnauthorized, api.Response{Message: "Please enter token string"})
 	}
 }
 

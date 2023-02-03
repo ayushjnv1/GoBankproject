@@ -9,7 +9,6 @@ type Response struct {
 	Message string `json:"message"`
 }
 
-
 func Error(rw http.ResponseWriter, status int, response interface{}) {
 	respBytes, err := json.Marshal(response)
 	if err != nil {
@@ -23,8 +22,8 @@ func Error(rw http.ResponseWriter, status int, response interface{}) {
 
 func Success(rw http.ResponseWriter, status int, response interface{}) {
 	respBytes, err := json.Marshal(response)
-	
-	if err != nil {		
+
+	if err != nil {
 		status = http.StatusInternalServerError
 	}
 	rw.Header().Add("Content-Type", "application/json")

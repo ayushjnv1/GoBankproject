@@ -10,7 +10,7 @@ import (
 	"github.com/urfave/cli"
 )
 
-func main(){
+func main() {
 	config.Load()
 	app.Init()
 	defer app.Close()
