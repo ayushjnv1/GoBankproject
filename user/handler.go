@@ -29,7 +29,7 @@ func Login(service Service)(http.HandlerFunc){
             api.Error(w,http.StatusBadRequest,api.Response{Message: err.Error()})
 			return
 		}
-		if !CheckPasswordHash(userLogin.Password,user.Password){
+		if !service.(*UserService).Encrypt.CheckPasswordHash(userLogin.Password,user.Password){
 			api.Error(w,http.StatusBadRequest,api.Response{Message: "Wrong password"})
 			return
 		}
@@ -57,6 +57,7 @@ func Create(service Service) (http.HandlerFunc){
 			return
 		}
 		err = service.CreateUser(r.Context(),user)
+		
 		if(IsBadRequest(err)){
 			api.Error(w,http.StatusBadRequest,api.Response{Message: err.Error()})	
 			return
@@ -132,7 +133,7 @@ func UpdateUserById(service Service) http.HandlerFunc{
 			return
 		}
 		err = service.UpadateUser(r.Context(),user,id)
-		
+		fmt.Printf("%+v",r);
 		if(IsBadRequest(err)){
 			api.Error(w,http.StatusNotFound,api.Response{Message: err.Error()})
 			return	

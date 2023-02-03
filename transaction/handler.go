@@ -45,14 +45,20 @@ func AmmountDeposit(service Service) http.HandlerFunc{
 
 func Amounttransection(service Service) http.HandlerFunc{
 	return func(w http.ResponseWriter, r *http.Request) {
-		var transReq TransRequest
+		var transReq = TransRequest{Amount: -1}
 		err := json.NewDecoder(r.Body).Decode(&transReq)
 		if err!=nil{
 			api.Error(w,http.StatusBadRequest,api.Response{Message: err.Error()})
 			return
 		}
+
+	    if(transReq.Amount < 0 || transReq.CreditAcc=="" || transReq.DebitAcc==""){
+			api.Error(w,http.StatusBadRequest,api.Response{Message: err.Error()})
+		} 
+
 		id := r.Header.Get("id")
 		amount,err := service.Amounttransection(r.Context(),transReq.Amount,transReq.CreditAcc,transReq.DebitAcc,id)
+
 		if err!=nil{
 			api.Error(w,http.StatusBadRequest,api.Response{Message: err.Error()})
 			return

@@ -46,7 +46,7 @@ type store struct{
 			case error:
 				err = errors.WithStack(p)
 		 	default:
-				err= errors.Errorf("s",p)	
+				err= errors.Errorf("%s",p)	
 			}
 		}
 	

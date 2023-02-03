@@ -33,7 +33,7 @@ func Load() {
 	appConfig = config{
 		appName:       readEnvString("APP_NAME"),
 		appPort:       8000,
-		// migrationPath: readEnvString("MIGRATION_PATH"),
+		migrationPath: readEnvString("MIGRATION_PATH"),
 		db:            newDatabaseConfig(),
 	}
 }

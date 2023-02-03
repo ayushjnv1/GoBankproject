@@ -15,16 +15,17 @@ type Service interface{
 	CreateUser(ctx context.Context,user UserCreate)(err error)
 }
 
-type userService struct{
-	store db.Storer
+type UserService struct{
+	Store db.Storer
+	Encrypt Encrypt
 }
 
-func (us *userService)UpadateUser(ctx context.Context,user UpdateUser,id string)(err error){
+func (us *UserService)UpadateUser(ctx context.Context,user UpdateUser,id string)(err error){
    err = UpdateUserValidate(user)
    if err!=nil {
     return
    }
-   err = us.store.UpdateUser(ctx,db.User{
+   err = us.Store.UpdateUser(ctx,db.User{
 	Name:user.Name,
 	Email: user.Email,
 	Role: user.Role,
@@ -32,8 +33,8 @@ func (us *userService)UpadateUser(ctx context.Context,user UpdateUser,id string)
    return 
 }
 
-func (us *userService) List( ctx context.Context)(resp UserList,err error){
-	userDbObj,err := us.store.ListOfUser(ctx)	
+func (us *UserService) List( ctx context.Context)(resp UserList,err error){
+	userDbObj,err := us.Store.ListOfUser(ctx)	
 	if err!=nil{
 		return 
 	}
@@ -53,16 +54,16 @@ func (us *userService) List( ctx context.Context)(resp UserList,err error){
 	return 
 }
 
-func (us *userService) CreateUser(ctx context.Context,user UserCreate)(err error){
+func (us *UserService) CreateUser(ctx context.Context,user UserCreate)(err error){
   err = ValidateCreateUser(user)
   if(err!=nil){
 	return
   }
-  password,err:= HashPassword(user.Password)
+  password,err:= us.Encrypt.HashPassword(user.Password)
 	if err!=nil{
 		return
 	}
-  err =  us.store.CreateUser(ctx,db.User{
+  err =  us.Store.CreateUser(ctx,db.User{
 	Name:user.Name,
 	Email: user.Email,
 	Role: user.Role,
@@ -71,13 +72,13 @@ func (us *userService) CreateUser(ctx context.Context,user UserCreate)(err error
   return 
 }
 
-func (us *userService) DeleteUser(ctx context.Context,id string) (err error){
-   err = us.store.DeleteUser(ctx,id)  
+func (us *UserService) DeleteUser(ctx context.Context,id string) (err error){
+   err = us.Store.DeleteUser(ctx,id)  
    return
 }
 
-func (us *userService) FindById(ctx context.Context,id string) (user UserResponse,err error){
-userdbo,err := us.store.FindById(ctx,id)
+func (us *UserService) FindById(ctx context.Context,id string) (user UserResponse,err error){
+userdbo,err := us.Store.FindById(ctx,id)
 if(err!=nil){
 	return
 }
@@ -91,8 +92,8 @@ user.User=UserResp{
 return
 }
 
-func (us *userService) FindByEmail(ctx context.Context,email string) (user UserCreate,err error){
-	userdbo,err := us.store.FindByEmail(ctx,email)
+func (us *UserService) FindByEmail(ctx context.Context,email string) (user UserCreate,err error){
+	userdbo,err := us.Store.FindByEmail(ctx,email)
 	if(err!=nil){
 		return
 	}
@@ -108,7 +109,8 @@ func (us *userService) FindByEmail(ctx context.Context,email string) (user UserC
 
 
 func NewUserService(db db.Storer) (Service){
- return &userService{
-	store: db,
+ return &UserService{
+	Store: db,
+	Encrypt: NewEncrypt(),
 }
 }

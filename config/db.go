@@ -23,6 +23,7 @@ func Database() databaseConfig {
 }
 
 func (c databaseConfig) Driver() string {
+	fmt.Println(c.driver)
 	return c.driver
 }
 

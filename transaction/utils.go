@@ -10,7 +10,7 @@ func  IsAmountSufficient(ctx context.Context, amount int,acc string,db db.Storer
 	if err!=nil{
 		return false,err
 	}
-	if amm<amount{
+	if amm<amount {
 		return false,err
 	}
 	return true,err

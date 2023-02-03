@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"database/sql"
+	"log"
 
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
@@ -17,7 +18,12 @@ const (
 
 func (s *store) Amounttransection(ctx context.Context,amount int,creditAcc string,debitAcc string)(err error){   
 	return Transaction(ctx,*s.db, &sql.TxOptions{},func(ctxwithTx context.Context,key string ) (err error){
-      tx := ctxwithTx.Value(key).(*sqlx.Tx);
+      txObj := ctxwithTx.Value(key)
+	  tx, ok := txObj.(*sqlx.Tx)
+	  if !ok {
+		log.Fatalf("error occured while type asserting transaction object from context")
+	  }
+
 	  tx1uuid,err :=uuid.NewRandom()	  
 	  if(err!=nil){
 	  return 
@@ -47,12 +53,17 @@ func (s *store) Amounttransection(ctx context.Context,amount int,creditAcc strin
 
 func (s *store) AmmountWithdraw(ctx context.Context,cid string, amount int)(err error){
  return Transaction(ctx,*s.db, &sql.TxOptions{},func(ctxwithTx context.Context, key string) (err error) {
-	tx := ctxwithTx.Value(key);
+	txObj := ctxwithTx.Value(key)
+	tx, ok := txObj.(*sqlx.Tx)
+	if !ok {
+	  log.Fatalf("error occured while type asserting transaction object from context")
+	}
+
 	tx1uuid,err :=uuid.NewRandom()	  
 	if(err!=nil){
 	return 
 	}  
-	res,err := tx.(*sqlx.Tx).ExecContext(ctxwithTx,debit,amount,cid)
+	res,err := tx.ExecContext(ctxwithTx,debit,amount,cid)
 	if(err!=nil){
 		return 
 	}
@@ -61,19 +72,24 @@ func (s *store) AmmountWithdraw(ctx context.Context,cid string, amount int)(err 
 		return ErrAccDebitNotExit
 	}
 	
-	_,err = tx.(*sqlx.Tx).ExecContext(ctxwithTx,withdraw,tx1uuid,amount,cid,"withdraw")
+	_,err = tx.ExecContext(ctxwithTx,withdraw,tx1uuid,amount,cid,"withdraw")
 	return 
    })
 }
 
 func (s *store) AmmountDeposit(ctx context.Context,cid string, amount int)(err error){
 	return Transaction(ctx,*s.db, &sql.TxOptions{},func(ctxwithTx context.Context, key string) (err error) {
-	   tx := ctxwithTx.Value(key);
+		txObj := ctxwithTx.Value(key)
+		tx, ok := txObj.(*sqlx.Tx)
+		if !ok {
+		  log.Fatalf("error occured while type asserting transaction object from context")
+		}
+  
 	   tx1uuid,err :=uuid.NewRandom()	  
 	   if(err!=nil){
 	   return 
 	   }  
-	   res,err := tx.(*sqlx.Tx).ExecContext(ctxwithTx,credit,amount,cid)
+	   res,err := tx.ExecContext(ctxwithTx,credit,amount,cid)
 	   if(err!=nil){
 		   return 
 	   }
@@ -82,7 +98,7 @@ func (s *store) AmmountDeposit(ctx context.Context,cid string, amount int)(err e
 		   return ErrAccCreditNotExit
 	   }
 	   
-	   _,err = tx.(*sqlx.Tx).ExecContext(ctxwithTx,deposit,tx1uuid,amount,cid,"deposit")
+	   _,err = tx.ExecContext(ctxwithTx,deposit,tx1uuid,amount,cid,"deposit")
 	   return 
 	  })
    }
