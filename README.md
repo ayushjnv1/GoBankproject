@@ -1,4 +1,4 @@
-# Library-Management-System
+# Banking-System
 
 Design Banking application
 There are two roles admin and enduser.
