@@ -1,8 +1,9 @@
 package server
 
 import (
+	"github.com/ayushjnv1/Gobank/account"
 	"github.com/ayushjnv1/Gobank/app"
-	"github.com/ayushjnv1/Gobank/customer"
+
 	"github.com/ayushjnv1/Gobank/db"
 	"github.com/ayushjnv1/Gobank/transaction"
 	"github.com/ayushjnv1/Gobank/user"
@@ -11,7 +12,7 @@ import (
 
 type Dependency struct {
 	UserService        user.Service
-	CustomerService    customer.Service
+	AccountService     account.Service
 	transactionService transaction.Service
 }
 
@@ -19,12 +20,12 @@ func initDependency() Dependency {
 	appDb := app.GetDB()
 	db := db.NewStore(appDb)
 	user := userpackage.NewUserService(db)
-	customer := customer.NewCustomerService(db)
+	account := account.NewAccountService(db)
 	transaction := transaction.NewTransactionService(db)
 
 	return Dependency{
 		UserService:        user,
-		CustomerService:    customer,
+		AccountService:     account,
 		transactionService: transaction,
 	}
 }

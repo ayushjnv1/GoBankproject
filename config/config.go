@@ -51,6 +51,7 @@ func readEnvString(key string) string {
 	checkIfSet(key)
 	return viper.GetString(key)
 }
+
 func checkIfSet(key string) {
 	if !viper.IsSet(key) {
 		err := errors.New(fmt.Sprintf("Key %s is not set", key))

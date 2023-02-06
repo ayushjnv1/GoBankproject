@@ -3,8 +3,8 @@ package server
 import (
 	"net/http"
 
+	"github.com/ayushjnv1/Gobank/account"
 	"github.com/ayushjnv1/Gobank/api"
-	"github.com/ayushjnv1/Gobank/customer"
 	"github.com/ayushjnv1/Gobank/transaction"
 	"github.com/ayushjnv1/Gobank/user"
 	"github.com/gorilla/mux"
@@ -25,15 +25,15 @@ func initRouter(dep Dependency) (router *mux.Router) {
 	router.HandleFunc("/users/{id}", user.Authorize(user.UpdateUserById(dep.UserService), 2)).Methods(http.MethodPut)
 
 	//Customer
-	router.HandleFunc("/customer", user.Authorize(customer.CreateCustomer(dep.CustomerService), 1)).Methods(http.MethodPost)
-	router.HandleFunc("/customer/{id}", user.Authorize(customer.DeleteCustomer(dep.CustomerService), 2)).Methods(http.MethodDelete)
-	router.HandleFunc("/customer/amount/{id}", user.Authorize(customer.GetammountAcc(dep.CustomerService), 2)).Methods(http.MethodGet)
+	router.HandleFunc("/customer", user.Authorize(account.CreateAccount(dep.AccountService), 1)).Methods(http.MethodPost)
+	router.HandleFunc("/customer/{id}", user.Authorize(account.DeleteAccount(dep.AccountService), 2)).Methods(http.MethodDelete)
+	router.HandleFunc("/customer/amount/{id}", user.Authorize(account.GetAccountBalance(dep.AccountService), 2)).Methods(http.MethodGet)
 
 	//transaction
-	router.HandleFunc("/amountTransaction", user.Authorize(transaction.Amounttransaction(dep.transactionService), 2)).Methods(http.MethodPost)
-	router.HandleFunc("/amountWithdraw", user.Authorize(transaction.AmountWithdraw(dep.transactionService), 1)).Methods(http.MethodPost)
-	router.HandleFunc("/amountDeposit", user.Authorize(transaction.AmmountDeposit(dep.transactionService), 1)).Methods(http.MethodPost)
-	router.HandleFunc("/amountTransactionlist", user.Authorize(transaction.TransactionList(dep.transactionService), 1)).Methods(http.MethodGet)
+	router.HandleFunc("/amountTransaction", user.Authorize(transaction.InitiateTransaction(dep.transactionService), 2)).Methods(http.MethodPost)
+	router.HandleFunc("/amountWithdraw", user.Authorize(transaction.WithdrawAmount(dep.transactionService), 1)).Methods(http.MethodPost)
+	router.HandleFunc("/amountDeposit", user.Authorize(transaction.DepositAmount(dep.transactionService), 1)).Methods(http.MethodPost)
+	router.HandleFunc("/amountTransactionlist", user.Authorize(transaction.FetchListOfTransaction(dep.transactionService), 1)).Methods(http.MethodGet)
 	return
 }
 

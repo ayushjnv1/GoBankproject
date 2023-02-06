@@ -1,27 +1,41 @@
 package transaction
 
-type TransRequest struct {
+type TransactionRequest struct {
 	DebitAcc  string `json:"debit_acc"`
 	CreditAcc string `json:"credit_acc"`
 	Amount    int    `json:"amount"`
 }
 
-type TransWithDrawRequest struct {
+type TransactionWithDrawRequest struct {
 	DebitAcc string `json:"debit_acc"`
 	Amount   int    `json:"amount"`
 }
-type TrnasResponse struct {
+type TrnasactionResponse struct {
 	Amount  int    `json:"amount"`
 	Message string `json:"message"`
 }
 
-type TransactionResp struct {
+type TransactionResponse struct {
 	Amount       int    `json:"amount"`
 	Type         string `json:"type"`
 	CreditAcc    string `json:"credit_acc"`
 	DebitAcc     string `json:"debit_acc"`
 	TransationAt string `json:"transation_at"`
 }
-type TransactionListResp struct {
-	List []TransactionResp `json:"transaction"`
+type TransactionListResponse struct {
+	List []TransactionResponse `json:"transaction"`
+}
+
+func Validation(txn TransactionRequest) error {
+	if txn.Amount < 0 {
+		return ErrorAmountNotExist
+	}
+	if txn.CreditAcc == "" {
+		return ErrorCreditAccountNotExist
+	}
+	if txn.DebitAcc == "" {
+		return ErrDebitAccountNotExist
+	}
+	return nil
+
 }

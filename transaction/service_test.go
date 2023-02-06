@@ -2,6 +2,7 @@ package transaction_test
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"testing"
 
@@ -30,31 +31,32 @@ func (t *TestSuiteService) SetupTest() {
 func (suite *TestSuiteService) TestAmounttransection() {
 	t := suite.T()
 	ctx := context.Background()
-	custd := db.Customer{Userid: "1", Balance: 1200, ID: "1234edfdsx"}
-	cust2 := db.Customer{Userid: "12", Balance: 1200, ID: "1234edfdsx"}
-	// custc := db.Customer{Uid: "1",Amount:200,Id:"1234edf"}
+	custd := db.Account{UserID: "1", Balance: 1200, ID: "1234edfdsx"}
+	cust2 := db.Account{UserID: "12", Balance: 1200, ID: "1234edfdsx"}
+	transactionObj := transaction.TransactionRequest{Amount: 1200, CreditAcc: "1234edf", DebitAcc: "1234edfdsx"}
+	transactionDBObj := db.TransactionStruct{Amount: 1200, CreditAcc: sql.NullString{String: "1234edf", Valid: true}, DebitAcc: sql.NullString{String: "1234edfdsx", Valid: true}}
 	t.Run("Successful transecetion ", func(t *testing.T) {
 		suite.SetupTest()
 
 		suite.store.On("GetAccountBalance", ctx, custd.ID).Once().Return(1200, nil)
-		suite.store.On("GetCustomer", ctx, custd.ID).Return(custd, nil)
-		suite.store.On("Amounttransaction", ctx, 1200, "1234edf", "1234edfdsx").Return(nil)
+		suite.store.On("GetAccount", ctx, custd.ID).Return(custd, nil)
+		suite.store.On("Amounttransaction", ctx, transactionDBObj).Return(nil)
 		suite.store.On("GetAccountBalance", ctx, custd.ID).Twice().Return(0, nil)
 
-		amm, err := suite.transection.Amounttransaction(ctx, 1200, "1234edf", "1234edfdsx", "1")
+		amm, err := suite.transection.Amounttransaction(ctx, transactionObj, "1")
 		assert.NoError(t, err)
 		assert.Equal(t, amm, 0)
 
 	})
 	t.Run("unsuccessful transecetion insufficient Ammount", func(t *testing.T) {
 		suite.SetupTest()
-
+		transactionDBObj.Amount = 1300
 		suite.store.On("GetAccountBalance", ctx, custd.ID).Once().Return(1200, nil)
-		suite.store.On("GetCustomer", ctx, custd.ID).Return(custd, nil)
-		suite.store.On("Amounttransaction", ctx, 1300, "1234edf", "1234edfdsx").Return(nil)
+		suite.store.On("GetAccount", ctx, custd.ID).Return(custd, nil)
+		suite.store.On("Amounttransaction", ctx, transactionDBObj).Return(nil)
 		suite.store.On("GetAccountBalance", ctx, custd.ID).Twice().Return(0, nil)
-
-		_, err := suite.transection.Amounttransaction(ctx, 1300, "1234edf", "1234edfdsx", "1")
+		transactionObj.Amount = 1300
+		_, err := suite.transection.Amounttransaction(ctx, transactionObj, "1")
 		assert.EqualError(t, err, transaction.ErrInSufficientAmmount.Error())
 
 	})
@@ -62,11 +64,11 @@ func (suite *TestSuiteService) TestAmounttransection() {
 		suite.SetupTest()
 
 		suite.store.On("GetAccountBalance", ctx, custd.ID).Once().Return(1200, nil)
-		suite.store.On("GetCustomer", ctx, custd.ID).Return(cust2, nil)
-		suite.store.On("Amounttransaction", ctx, 1200, "1234edf", "1234edfdsx").Return(nil)
+		suite.store.On("GetAccount", ctx, custd.ID).Return(cust2, nil)
+		suite.store.On("Amounttransaction", ctx, transactionDBObj).Return(nil)
 		suite.store.On("GetAccountBalance", ctx, custd.ID).Twice().Return(0, nil)
 
-		_, err := suite.transection.Amounttransaction(ctx, 1200, "1234edf", "1234edfdsx", "1")
+		_, err := suite.transection.Amounttransaction(ctx, transactionObj, "1")
 		assert.EqualError(t, err, transaction.ErrUnAuthorize.Error())
 		fmt.Printf(err.Error(), "message")
 	})

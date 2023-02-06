@@ -21,14 +21,14 @@ type Storer interface {
 	//transaction
 	AmmountWithdraw(ctx context.Context, cid string, amount int) (err error)
 	AmmountDeposit(ctx context.Context, cid string, amount int) (err error)
-	Amounttransaction(ctx context.Context, amount int, creditAcc string, debitAcc string) (err error)
+	Amounttransaction(ctx context.Context, transaction TransactionStruct) (err error)
 	AllTransactionList(ctx context.Context) (list []TransactionStruct, err error)
 
-	//customer
+	//account
 	GetAccountBalance(ctx context.Context, id string) (amount int, err error)
-	CreateCustomer(ctx context.Context, uid string) (cust Customer, err error)
-	GetCustomer(ctx context.Context, cid string) (cust Customer, err error)
-	DeleteCustomer(ctx context.Context, cid string) (cust Customer, err error)
+	CreateAccount(ctx context.Context, uid string) (account Account, err error)
+	GetAccount(ctx context.Context, cid string) (account Account, err error)
+	DeleteAccount(ctx context.Context, cid string) (account Account, err error)
 }
 type store struct {
 	db *sqlx.DB

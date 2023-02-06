@@ -32,7 +32,7 @@ func Login(service Service) http.HandlerFunc {
 			api.Error(w, http.StatusBadRequest, api.Response{Message: "Wrong password"})
 			return
 		}
-		jwtString, err := GenerateJWT(user.Id, user.Email, user.Role)
+		jwtString, err := GenerateJWT(user.ID, user.Email, user.Role)
 		if err != nil {
 			api.Error(w, http.StatusInternalServerError, api.Response{Message: err.Error()})
 			return
@@ -121,12 +121,12 @@ func UpdateUserById(service Service) http.HandlerFunc {
 		var user UpdateUser
 		err := json.NewDecoder(r.Body).Decode(&user)
 		vars := mux.Vars(r)
-		id := vars["id"]
+		ID := vars["id"]
 		if err != nil {
 			api.Error(w, http.StatusBadRequest, api.Response{Message: err.Error()})
 			return
 		}
-		err = service.UpadateUser(r.Context(), user, id)
+		err = service.UpadateUser(r.Context(), user, ID)
 		fmt.Printf("%+v", r)
 		if IsBadRequest(err) {
 			api.Error(w, http.StatusNotFound, api.Response{Message: err.Error()})

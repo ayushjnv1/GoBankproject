@@ -14,15 +14,15 @@ type Service struct {
 	mock.Mock
 }
 
-// AllTransactionList provides a mock function with given fields: ctx
-func (_m *Service) AllTransactionList(ctx context.Context) (transaction.TransactionListResp, error) {
+// AllTransactions provides a mock function with given fields: ctx
+func (_m *Service) AllTransactions(ctx context.Context) (transaction.TransactionListResponse, error) {
 	ret := _m.Called(ctx)
 
-	var r0 transaction.TransactionListResp
-	if rf, ok := ret.Get(0).(func(context.Context) transaction.TransactionListResp); ok {
+	var r0 transaction.TransactionListResponse
+	if rf, ok := ret.Get(0).(func(context.Context) transaction.TransactionListResponse); ok {
 		r0 = rf(ctx)
 	} else {
-		r0 = ret.Get(0).(transaction.TransactionListResp)
+		r0 = ret.Get(0).(transaction.TransactionListResponse)
 	}
 
 	var r1 error
@@ -77,20 +77,20 @@ func (_m *Service) AmmountWithdraw(ctx context.Context, amount int, debitAcc str
 	return r0, r1
 }
 
-// Amounttransaction provides a mock function with given fields: ctx, amount, creditAcc, debitAcc, uid
-func (_m *Service) Amounttransaction(ctx context.Context, amount int, creditAcc string, debitAcc string, uid string) (int, error) {
-	ret := _m.Called(ctx, amount, creditAcc, debitAcc, uid)
+// Amounttransaction provides a mock function with given fields: ctx, transactionRequest, userID
+func (_m *Service) Amounttransaction(ctx context.Context, transactionRequest transaction.TransactionRequest, userID string) (int, error) {
+	ret := _m.Called(ctx, transactionRequest, userID)
 
 	var r0 int
-	if rf, ok := ret.Get(0).(func(context.Context, int, string, string, string) int); ok {
-		r0 = rf(ctx, amount, creditAcc, debitAcc, uid)
+	if rf, ok := ret.Get(0).(func(context.Context, transaction.TransactionRequest, string) int); ok {
+		r0 = rf(ctx, transactionRequest, userID)
 	} else {
 		r0 = ret.Get(0).(int)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, int, string, string, string) error); ok {
-		r1 = rf(ctx, amount, creditAcc, debitAcc, uid)
+	if rf, ok := ret.Get(1).(func(context.Context, transaction.TransactionRequest, string) error); ok {
+		r1 = rf(ctx, transactionRequest, userID)
 	} else {
 		r1 = ret.Error(1)
 	}

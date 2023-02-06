@@ -9,7 +9,7 @@ import (
 )
 
 type User struct {
-	Id        string    `db:"id"`
+	ID        string    `db:"id"`
 	Name      string    `db:"name"`
 	Password  string    `db:"password"`
 	Email     string    `db:"email"`
@@ -34,9 +34,9 @@ func (s *store) CreateUser(ctx context.Context, user User) (err error) {
 	return err
 }
 
-func (s *store) DeleteUser(ctx context.Context, id string) (err error) {
+func (s *store) DeleteUser(ctx context.Context, ID string) (err error) {
 
-	res, err := s.db.ExecContext(ctx, deleteUser, id)
+	res, err := s.db.ExecContext(ctx, deleteUser, ID)
 	if err != nil {
 		return err
 	}
@@ -46,9 +46,10 @@ func (s *store) DeleteUser(ctx context.Context, id string) (err error) {
 	}
 	return
 }
-func (s *store) UpdateUser(ctx context.Context, user User, id string) (err error) {
+func (s *store) UpdateUser(ctx context.Context, user User, ID string) (err error) {
 
-	res, err := s.db.ExecContext(ctx, updateUser, user.Name, user.Email, user.Role, id)
+	params := []interface{}{user.Name, user.Email, user.Role, ID}
+	res, err := s.db.ExecContext(ctx, updateUser, params...)
 	if err != nil {
 		return
 	}
@@ -59,8 +60,10 @@ func (s *store) UpdateUser(ctx context.Context, user User, id string) (err error
 	}
 	return
 }
-func (s *store) UpdatePassword(ctx context.Context, pass string, Id string) (err error) {
-	res, err := s.db.ExecContext(ctx, updatePassword, pass, Id)
+func (s *store) UpdatePassword(ctx context.Context, password string, ID string) (err error) {
+
+	params := []interface{}{password, ID}
+	res, err := s.db.ExecContext(ctx, updatePassword, params...)
 	if err != nil {
 		return
 	}
@@ -79,9 +82,9 @@ func (s *store) ListOfUser(ctx context.Context) (user []User, err error) {
 	}
 	return
 }
-func (s *store) FindById(ctx context.Context, id string) (user User, err error) {
+func (s *store) FindById(ctx context.Context, ID string) (user User, err error) {
 	use := []User{}
-	err = s.db.SelectContext(ctx, &use, findById, id)
+	err = s.db.SelectContext(ctx, &use, findById, ID)
 
 	if len(use) == 0 {
 		return user, ErrUserNotExist
@@ -90,14 +93,14 @@ func (s *store) FindById(ctx context.Context, id string) (user User, err error) 
 }
 
 func (s *store) FindByEmail(ctx context.Context, email string) (user User, err error) {
-	use := []User{}
-	err = s.db.SelectContext(ctx, &use, findbyEmail, email)
-	fmt.Println(use, "user db", email)
+	userList := []User{}
+	err = s.db.SelectContext(ctx, &userList, findbyEmail, email)
+
 	if err != nil {
 		return
 	}
-	if len(use) == 0 {
+	if len(userList) == 0 {
 		return user, ErrUserNotExist
 	}
-	return use[0], err
+	return userList[0], err
 }

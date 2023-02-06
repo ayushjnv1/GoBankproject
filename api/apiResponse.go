@@ -5,6 +5,11 @@ import (
 	"net/http"
 )
 
+type SuccessResponse struct {
+	Message string      `json:"message,omitempty"`
+	Data    interface{} `json:"data",omitempty`
+}
+
 type Response struct {
 	Message string `json:"message"`
 }
@@ -12,20 +17,21 @@ type Response struct {
 func Error(rw http.ResponseWriter, status int, response interface{}) {
 	respBytes, err := json.Marshal(response)
 	if err != nil {
-		// app.GetLogger().Error(err)
 		status = http.StatusInternalServerError
 	}
+
 	rw.Header().Add("Content-Type", "application/json")
 	rw.WriteHeader(status)
 	rw.Write(respBytes)
 }
 
 func Success(rw http.ResponseWriter, status int, response interface{}) {
-	respBytes, err := json.Marshal(response)
 
+	respBytes, err := json.Marshal(response)
 	if err != nil {
 		status = http.StatusInternalServerError
 	}
+
 	rw.Header().Add("Content-Type", "application/json")
 	rw.WriteHeader(status)
 	rw.Write(respBytes)

@@ -1,7 +1,7 @@
 package user
 
 type UserCreate struct {
-	Id       string `json:"id"`
+	ID       string `json:"id"`
 	Name     string `json:"name"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
@@ -17,7 +17,7 @@ type UpdateUser struct {
 	Role  string `json:"role"`
 }
 type UserResp struct {
-	Id    string `json:"id"`
+	ID    string `json:"id"`
 	Name  string `json:"name"`
 	Email string `json:"email"`
 	Role  string `json:"role"`

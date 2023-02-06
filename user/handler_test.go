@@ -81,7 +81,7 @@ func (suite *TestSuiteHandler) TestList() {
 	url := "/users"
 	r := httptest.NewRequest(http.MethodGet, url, nil)
 	w := httptest.NewRecorder()
-	userli := []user.UserResp{{Id: "1", Name: "ayush", Email: "ayush", Role: "admin"}}
+	userli := []user.UserResp{{ID: "1", Name: "ayush", Email: "ayush", Role: "admin"}}
 	userList := user.UserList{User: userli}
 
 	t.Run("user get list", func(t *testing.T) {

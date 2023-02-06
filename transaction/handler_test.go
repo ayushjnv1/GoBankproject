@@ -40,7 +40,7 @@ func (suite *TestSuiteHandler) TestTransection() {
 	t.Run("transection succesfully", func(t *testing.T) {
 		suite.SetupTest()
 		suite.service.On("Amounttransection", r1.Context(), 1800, "dummy:account", "dummy::string", "1").Return(1200, nil)
-		transaction.Amounttransaction(suite.service)(w1, r1)
+		transaction.InitiateTransaction(suite.service)(w1, r1)
 		assert.Equal(t, 202, w1.Code)
 
 	})
@@ -54,7 +54,7 @@ func (suite *TestSuiteHandler) TestTransection() {
 	t.Run("transection unsuccesfully", func(t *testing.T) {
 		suite.SetupTest()
 		suite.service.On("Amounttransection", r2.Context(), 1800, "dummy:account", "", "1").Return(1200, nil)
-		transaction.Amounttransaction(suite.service)(w2, r2)
+		transaction.InitiateTransaction(suite.service)(w2, r2)
 		assert.Equal(t, http.StatusBadRequest, w2.Code)
 	})
 	assert.Equal(t, http.StatusBadRequest, w2.Code)

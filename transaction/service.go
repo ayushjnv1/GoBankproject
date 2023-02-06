@@ -2,54 +2,60 @@ package transaction
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 
 	"github.com/ayushjnv1/Gobank/db"
 )
 
 type Service interface {
-	Amounttransaction(ctx context.Context, amount int, creditAcc string, debitAcc string, uid string) (amountRem int, err error)
-	AmmountWithdraw(ctx context.Context, amount int, debitAcc string) (amountRem int, err error)
-	AmmountDeposit(ctx context.Context, amount int, creditAcc string) (amountR int, err error)
-	AllTransactionList(ctx context.Context) (list TransactionListResp, err error)
+	Amounttransaction(ctx context.Context, transactionRequest TransactionRequest, userID string) (amountRemaining int, err error)
+	AmmountWithdraw(ctx context.Context, amount int, debitAcc string) (amountRemaining int, err error)
+	AmmountDeposit(ctx context.Context, amount int, creditAcc string) (amountRemaining int, err error)
+	AllTransactions(ctx context.Context) (list TransactionListResponse, err error)
 }
 
 type transactionService struct {
 	db db.Storer
 }
 
-func (ts *transactionService) Amounttransaction(ctx context.Context, amount int, creditAcc string, debitAcc string, uid string) (amountRem int, err error) {
-	isSufficient, err := IsAmountSufficient(ctx, amount, debitAcc, ts.db)
+func (ts *transactionService) Amounttransaction(ctx context.Context, transactionRequest TransactionRequest, userId string) (amountRemaining int, err error) {
+	isSufficient, err := IsAmountSufficient(ctx, transactionRequest.Amount, transactionRequest.DebitAcc, ts.db)
 	if err != nil {
 		return
 	}
 	if !isSufficient {
-		return amountRem, ErrInSufficientAmmount
+		return amountRemaining, ErrInSufficientAmmount
 	}
 
-	isAllow, err := IsLoginUserCustomer(ctx, uid, debitAcc, ts.db)
+	isAllow, err := IsLoginUserAccount(ctx, userId, transactionRequest.DebitAcc, ts.db)
 	if err != nil {
-		return amountRem, err
+		return amountRemaining, err
 	}
 	if !isAllow {
-		return amountRem, ErrUnAuthorize
+		return amountRemaining, ErrUnAuthorize
 	}
-
-	err = ts.db.Amounttransaction(ctx, amount, creditAcc, debitAcc)
+	transactionDb := db.TransactionStruct{
+		Amount:    transactionRequest.Amount,
+		CreditAcc: sql.NullString{String: transactionRequest.CreditAcc, Valid: true},
+		DebitAcc:  sql.NullString{String: transactionRequest.DebitAcc, Valid: true},
+	}
+	err = ts.db.Amounttransaction(ctx, transactionDb)
 	if err != nil {
 		return
 	}
-	amountRem, err = ts.db.GetAccountBalance(ctx, debitAcc)
-	return amountRem, err
+
+	amountRemaining, err = ts.db.GetAccountBalance(ctx, transactionRequest.DebitAcc)
+	return amountRemaining, err
 }
 
-func (ts *transactionService) AmmountWithdraw(ctx context.Context, amount int, debitAcc string) (amountRem int, err error) {
+func (ts *transactionService) AmmountWithdraw(ctx context.Context, amount int, debitAcc string) (amountRemaining int, err error) {
 	isSufficient, err := IsAmountSufficient(ctx, amount, debitAcc, ts.db)
 	if err != nil {
 		return
 	}
 	if !isSufficient {
-		return amountRem, ErrInSufficientAmmount
+		return amountRemaining, ErrInSufficientAmmount
 	}
 
 	err = ts.db.AmmountWithdraw(ctx, debitAcc, amount)
@@ -57,29 +63,29 @@ func (ts *transactionService) AmmountWithdraw(ctx context.Context, amount int, d
 		return
 	}
 
-	amountRem, err = ts.db.GetAccountBalance(ctx, debitAcc)
-	return amountRem, err
+	amountRemaining, err = ts.db.GetAccountBalance(ctx, debitAcc)
+	return amountRemaining, err
 }
 
-func (ts *transactionService) AmmountDeposit(ctx context.Context, amount int, debitAcc string) (amountR int, err error) {
+func (ts *transactionService) AmmountDeposit(ctx context.Context, amount int, debitAcc string) (amountRemaining int, err error) {
 	err = ts.db.AmmountDeposit(ctx, debitAcc, amount)
 	if err != nil {
 		return
 	}
-	amountR, err = ts.db.GetAccountBalance(ctx, debitAcc)
-	return amountR, err
+	amountRemaining, err = ts.db.GetAccountBalance(ctx, debitAcc)
+	return amountRemaining, err
 }
 
-func (ts *transactionService) AllTransactionList(ctx context.Context) (list TransactionListResp, err error) {
+func (ts *transactionService) AllTransactions(ctx context.Context) (list TransactionListResponse, err error) {
 	listdbO, err := ts.db.AllTransactionList(ctx)
 	if err != nil {
 		return
 	}
 
-	listTrans := []TransactionResp{}
+	listTrans := []TransactionResponse{}
 
 	for _, item := range listdbO {
-		txn := TransactionResp{}
+		txn := TransactionResponse{}
 		txn.Amount = item.Amount
 		txn.CreditAcc = item.CreditAcc.String
 		txn.DebitAcc = item.DebitAcc.String

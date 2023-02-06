@@ -45,7 +45,7 @@ func (us *UserService) List(ctx context.Context) (resp UserList, err error) {
 		ur.Email = u.Email
 		ur.Name = u.Name
 		ur.Role = u.Role
-		ur.Id = u.Id
+		ur.ID = u.ID
 		userlist = append(userlist, ur)
 	}
 
@@ -72,13 +72,13 @@ func (us *UserService) CreateUser(ctx context.Context, user UserCreate) (err err
 	return
 }
 
-func (us *UserService) DeleteUser(ctx context.Context, id string) (err error) {
-	err = us.Store.DeleteUser(ctx, id)
+func (us *UserService) DeleteUser(ctx context.Context, ID string) (err error) {
+	err = us.Store.DeleteUser(ctx, ID)
 	return
 }
 
-func (us *UserService) FindById(ctx context.Context, id string) (user UserResponse, err error) {
-	userdbo, err := us.Store.FindById(ctx, id)
+func (us *UserService) FindById(ctx context.Context, ID string) (user UserResponse, err error) {
+	userdbo, err := us.Store.FindById(ctx, ID)
 	if err != nil {
 		return
 	}
@@ -86,7 +86,7 @@ func (us *UserService) FindById(ctx context.Context, id string) (user UserRespon
 		Email: userdbo.Email,
 		Name:  userdbo.Name,
 		Role:  userdbo.Role,
-		Id:    userdbo.Id,
+		ID:    userdbo.ID,
 	}
 	return
 }
@@ -100,7 +100,7 @@ func (us *UserService) FindByEmail(ctx context.Context, email string) (user User
 		Email:    userdbo.Email,
 		Name:     userdbo.Name,
 		Role:     userdbo.Role,
-		Id:       userdbo.Id,
+		ID:       userdbo.ID,
 		Password: userdbo.Password,
 	}
 	return

@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"log"
 	"time"
 
@@ -11,25 +12,25 @@ import (
 )
 
 const (
-	transQuery     = "INSERT INTO transaction(id,amount,cid_credit,cid_debit,type,transaction_at) VALUES(?,?,?,?,?,?)"
-	debit          = "UPDATE customer SET amount = amount-? WHERE id=? "
-	credit         = "UPDATE customer SET amount = amount+? WHERE id=?"
-	withdraw       = "INSERT INTO transaction(id,amount,cid_debit,type,transaction_at) VALUES(?,?,?,?,?)"
-	deposit        = "INSERT INTO transaction(id,amount,cid_credit,type,transaction_at) VALUES(?,?,?,?,?)"
+	transQuery     = "INSERT INTO transaction(id,amount,aid_credit,aid_debit,type,transaction_at) VALUES(?,?,?,?,?,?)"
+	debit          = "UPDATE account SET balance = balance-? WHERE id=? "
+	credit         = "UPDATE account SET balance = balance+? WHERE id=?"
+	withdraw       = "INSERT INTO transaction(id,amount,aid_debit,type,transaction_at) VALUES(?,?,?,?,?)"
+	deposit        = "INSERT INTO transaction(id,amount,aid_credit,type,transaction_at) VALUES(?,?,?,?,?)"
 	transactionall = "SELECT * FROM transaction"
-	transaction    = "SELECT * FROM transaction where cid_debit=? or cid_credit=?"
+	transaction    = "SELECT * FROM transaction where aid_debit=? or aid_credit=?"
 )
 
 type TransactionStruct struct {
 	Id            string         `db:"id"`
 	Amount        int            `db:"amount"`
-	CreditAcc     sql.NullString `db:"cid_credit"`
-	DebitAcc      sql.NullString `db:"cid_debit"`
+	CreditAcc     sql.NullString `db:"aid_credit"`
+	DebitAcc      sql.NullString `db:"aid_debit"`
 	Type          string         `db:"type"`
 	TransactionAt string         `db:"transaction_at"`
 }
 
-func (s *store) Amounttransaction(ctx context.Context, amount int, creditAcc string, debitAcc string) (err error) {
+func (s *store) Amounttransaction(ctx context.Context, transaction TransactionStruct) (err error) {
 	return Transaction(ctx, *s.db, &sql.TxOptions{}, func(ctxwithTx context.Context, key string) (err error) {
 		txObj := ctxwithTx.Value(key)
 		tx, ok := txObj.(*sqlx.Tx)
@@ -41,7 +42,9 @@ func (s *store) Amounttransaction(ctx context.Context, amount int, creditAcc str
 		if err != nil {
 			return
 		}
-		res, err := tx.ExecContext(ctxwithTx, debit, amount, debitAcc)
+		parmsListDebit := []interface{}{transaction.Amount, transaction.DebitAcc}
+
+		res, err := tx.ExecContext(ctxwithTx, debit, parmsListDebit...)
 		if err != nil {
 			return err
 		}
@@ -49,8 +52,8 @@ func (s *store) Amounttransaction(ctx context.Context, amount int, creditAcc str
 		if count == 0 {
 			return ErrAccDebitNotExit
 		}
-
-		res2, err := tx.ExecContext(ctxwithTx, credit, amount, creditAcc)
+		paramsListCredit := []interface{}{transaction.Amount, transaction.CreditAcc}
+		res2, err := tx.ExecContext(ctxwithTx, credit, paramsListCredit...)
 		if err != nil {
 			return ErrAccCreditNotExit
 		}
@@ -58,13 +61,14 @@ func (s *store) Amounttransaction(ctx context.Context, amount int, creditAcc str
 		if count == 0 {
 			return ErrAccCreditNotExit
 		}
-		_, err = tx.ExecContext(ctxwithTx, transQuery, tx1uuid.String(), amount, creditAcc, debitAcc, "txn", time.Now().String())
+		paramsListtransaction := []interface{}{tx1uuid.String(), transaction.Amount, transaction.CreditAcc, transaction.DebitAcc, "txn", time.Now().String()}
+		_, err = tx.ExecContext(ctxwithTx, transQuery, paramsListtransaction...)
 
 		return err
 	})
 }
 
-func (s *store) AmmountWithdraw(ctx context.Context, cid string, amount int) (err error) {
+func (s *store) AmmountWithdraw(ctx context.Context, AccountID string, amount int) (err error) {
 	return Transaction(ctx, *s.db, &sql.TxOptions{}, func(ctxwithTx context.Context, key string) (err error) {
 		txObj := ctxwithTx.Value(key)
 		tx, ok := txObj.(*sqlx.Tx)
@@ -72,46 +76,58 @@ func (s *store) AmmountWithdraw(ctx context.Context, cid string, amount int) (er
 			log.Fatalf("error occured while type asserting transaction object from context")
 		}
 
-		tx1uuid, err := uuid.NewRandom()
+		txnuuid, err := uuid.NewRandom()
 		if err != nil {
 			return
 		}
-		res, err := tx.ExecContext(ctxwithTx, debit, amount, cid)
+
+		paramsDebit := []interface{}{amount, AccountID}
+		res, err := tx.ExecContext(ctxwithTx, debit, paramsDebit...)
 		if err != nil {
 			return
 		}
+
 		count, _ := res.RowsAffected()
 		if count == 0 {
 			return ErrAccDebitNotExit
 		}
 
-		_, err = tx.ExecContext(ctxwithTx, withdraw, tx1uuid, amount, cid, "withdraw", time.Now().String())
+		paramsListtransaction := []interface{}{txnuuid, amount, AccountID, "withdraw", time.Now().String()}
+		_, err = tx.ExecContext(ctxwithTx, withdraw, paramsListtransaction...)
 		return
 	})
 }
 
-func (s *store) AmmountDeposit(ctx context.Context, cid string, amount int) (err error) {
+func (s *store) AmmountDeposit(ctx context.Context, AccountId string, amount int) (err error) {
 	return Transaction(ctx, *s.db, &sql.TxOptions{}, func(ctxwithTx context.Context, key string) (err error) {
 		txObj := ctxwithTx.Value(key)
 		tx, ok := txObj.(*sqlx.Tx)
 		if !ok {
-			log.Fatalf("error occured while type asserting transaction object from context")
+			return errors.New("error occured while type asserting transaction object from context")
 		}
 
-		tx1uuid, err := uuid.NewRandom()
+		txnuuid, err := uuid.NewRandom()
 		if err != nil {
 			return
 		}
-		res, err := tx.ExecContext(ctxwithTx, credit, amount, cid)
+
+		paramsCredit := []interface{}{amount, AccountId}
+		res, err := tx.ExecContext(ctxwithTx, credit, paramsCredit...)
 		if err != nil {
 			return
 		}
-		count, _ := res.RowsAffected()
+
+		count, err := res.RowsAffected()
+		if err != nil {
+			return err
+		}
+
 		if count == 0 {
 			return ErrAccCreditNotExit
 		}
 
-		_, err = tx.ExecContext(ctxwithTx, deposit, tx1uuid, amount, cid, "deposit", time.Now().String())
+		paramsTransaction := []interface{}{txnuuid, amount, AccountId, "deposit", time.Now().String()}
+		_, err = tx.ExecContext(ctxwithTx, deposit, paramsTransaction...)
 		return
 	})
 }
