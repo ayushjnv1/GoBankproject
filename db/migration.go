@@ -24,7 +24,6 @@ func RunMigrations() error {
 
 	db, err := sql.Open(dbConfig.Driver(), dbConfig.ConnectionURL())
 	if err != nil {
-		fmt.Println(err)
 		return err
 	}
 
@@ -47,7 +46,6 @@ func RunMigrations() error {
 }
 
 func getDBDriverInstance(db *sql.DB, driver string) (database.Driver, error) {
-	fmt.Println(driver)
 	switch driver {
 	case "mysql":
 		return mysql.WithInstance(db, &mysql.Config{})
@@ -60,7 +58,7 @@ func CreateMigrationFile(filename string) error {
 	if len(filename) == 0 {
 		return errors.New("filename is not provided")
 	}
-	fmt.Println(filename)
+
 	timeStamp := time.Now().Unix()
 	upMigrationFilePath := fmt.Sprintf("%s/%d_%s.up.sql", config.MigrationPath(), timeStamp, filename)
 	downMigrationFilePath := fmt.Sprintf("%s/%d_%s.down.sql", config.MigrationPath(), timeStamp, filename)
@@ -68,8 +66,6 @@ func CreateMigrationFile(filename string) error {
 	if err := createFile(upMigrationFilePath); err != nil {
 		return err
 	}
-
-	fmt.Printf("created %s\n", upMigrationFilePath)
 
 	if err := createFile(downMigrationFilePath); err != nil {
 		os.Remove(upMigrationFilePath)

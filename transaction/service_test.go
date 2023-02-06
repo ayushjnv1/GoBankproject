@@ -3,7 +3,6 @@ package transaction_test
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"testing"
 
 	"github.com/ayushjnv1/Gobank/db"
@@ -70,6 +69,6 @@ func (suite *TestSuiteService) TestAmounttransection() {
 
 		_, err := suite.transection.Amounttransaction(ctx, transactionObj, "1")
 		assert.EqualError(t, err, transaction.ErrUnAuthorize.Error())
-		fmt.Printf(err.Error(), "message")
+
 	})
 }

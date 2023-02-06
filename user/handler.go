@@ -2,7 +2,6 @@ package user
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/ayushjnv1/Gobank/api"
@@ -18,7 +17,7 @@ func Login(service Service) http.HandlerFunc {
 			api.Error(w, http.StatusBadRequest, api.Response{Message: err.Error()})
 			return
 		}
-		fmt.Println(userLogin.Email)
+
 		user, err := service.FindByEmail(r.Context(), userLogin.Email)
 		if err != nil {
 			if err == db.ErrUserNotExist {
@@ -127,7 +126,7 @@ func UpdateUserById(service Service) http.HandlerFunc {
 			return
 		}
 		err = service.UpadateUser(r.Context(), user, ID)
-		fmt.Printf("%+v", r)
+
 		if IsBadRequest(err) {
 			api.Error(w, http.StatusNotFound, api.Response{Message: err.Error()})
 			return

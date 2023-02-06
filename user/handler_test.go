@@ -56,7 +56,7 @@ func (suite *TestSuiteHandler) TestUpdateTicket() {
 	// r = r.WithContext(ctx)
 
 	w := httptest.NewRecorder()
-	fmt.Println(mux.Vars(r)["id"])
+
 	userObj := user.UpdateUser{
 		Name:  "ayush",
 		Email: "ayush12@gmail1.com",

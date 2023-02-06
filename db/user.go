@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 	"time"
 )
 
@@ -29,7 +28,6 @@ const (
 )
 
 func (s *store) CreateUser(ctx context.Context, user User) (err error) {
-	fmt.Println(user, "user")
 	_, err = s.db.DB.ExecContext(ctx, createUser, user.Name, user.Password, user.Email, user.Role)
 	return err
 }

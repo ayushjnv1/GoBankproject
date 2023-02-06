@@ -24,7 +24,7 @@ func initRouter(dep Dependency) (router *mux.Router) {
 	router.HandleFunc("/users/{id}", user.Authorize(user.DeleteById(dep.UserService), 1)).Methods(http.MethodDelete)
 	router.HandleFunc("/users/{id}", user.Authorize(user.UpdateUserById(dep.UserService), 2)).Methods(http.MethodPut)
 
-	//Customer
+	//Account
 	router.HandleFunc("/account", user.Authorize(account.CreateAccount(dep.AccountService), 1)).Methods(http.MethodPost)
 	router.HandleFunc("/account/{id}", user.Authorize(account.DeleteAccount(dep.AccountService), 2)).Methods(http.MethodDelete)
 	router.HandleFunc("/account/amount/{id}", user.Authorize(account.GetAccountBalance(dep.AccountService), 2)).Methods(http.MethodGet)
