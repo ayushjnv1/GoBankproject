@@ -35,7 +35,7 @@ func (s *store) Amounttransaction(ctx context.Context, transaction TransactionSt
 		txObj := ctxwithTx.Value(key)
 		tx, ok := txObj.(*sqlx.Tx)
 		if !ok {
-			log.Fatalf("error occured while type asserting transaction object from context")
+			return errors.New("error occured while type asserting transaction object from context")
 		}
 
 		tx1uuid, err := uuid.NewRandom()
@@ -48,20 +48,28 @@ func (s *store) Amounttransaction(ctx context.Context, transaction TransactionSt
 		if err != nil {
 			return err
 		}
-		count, _ := res.RowsAffected()
+		count, err := res.RowsAffected()
+		if err != nil {
+			return nil
+		}
 		if count == 0 {
 			return ErrAccDebitNotExit
 		}
+
 		paramsListCredit := []interface{}{transaction.Amount, transaction.CreditAcc}
 		res2, err := tx.ExecContext(ctxwithTx, credit, paramsListCredit...)
 		if err != nil {
 			return ErrAccCreditNotExit
 		}
-		count, _ = res2.RowsAffected()
+		count, err = res2.RowsAffected()
+		if err != nil {
+			return err
+		}
 		if count == 0 {
 			return ErrAccCreditNotExit
 		}
-		paramsListtransaction := []interface{}{tx1uuid.String(), transaction.Amount, transaction.CreditAcc, transaction.DebitAcc, "txn", time.Now().String()}
+		timeCurrent := time.Now().String()
+		paramsListtransaction := []interface{}{tx1uuid.String(), transaction.Amount, transaction.CreditAcc, transaction.DebitAcc, "txn", timeCurrent}
 		_, err = tx.ExecContext(ctxwithTx, transQuery, paramsListtransaction...)
 
 		return err
@@ -87,12 +95,15 @@ func (s *store) AmmountWithdraw(ctx context.Context, AccountID string, amount in
 			return
 		}
 
-		count, _ := res.RowsAffected()
+		count, err := res.RowsAffected()
+		if err != nil {
+			return err
+		}
 		if count == 0 {
 			return ErrAccDebitNotExit
 		}
-
-		paramsListtransaction := []interface{}{txnuuid, amount, AccountID, "withdraw", time.Now().String()}
+		timeCurrent := time.Now().String()
+		paramsListtransaction := []interface{}{txnuuid, amount, AccountID, "withdraw", timeCurrent}
 		_, err = tx.ExecContext(ctxwithTx, withdraw, paramsListtransaction...)
 		return
 	})
@@ -125,8 +136,8 @@ func (s *store) AmmountDeposit(ctx context.Context, AccountId string, amount int
 		if count == 0 {
 			return ErrAccCreditNotExit
 		}
-
-		paramsTransaction := []interface{}{txnuuid, amount, AccountId, "deposit", time.Now().String()}
+		timeCurrent := time.Now().String()
+		paramsTransaction := []interface{}{txnuuid, amount, AccountId, "deposit", timeCurrent}
 		_, err = tx.ExecContext(ctxwithTx, deposit, paramsTransaction...)
 		return
 	})

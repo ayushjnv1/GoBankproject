@@ -30,7 +30,7 @@ func (suite *TestSuiteHandler) SetupTest() {
 	suite.service = &mocks.Service{}
 }
 
-func (suite *TestSuiteHandler) TestUpdateTicket() {
+func (suite *TestSuiteHandler) TestUpdateUser() {
 	t := suite.T()
 
 	fmt.Println("call ")
@@ -40,21 +40,10 @@ func (suite *TestSuiteHandler) TestUpdateTicket() {
 		"email":"ayush12@gmail1.com",
 		"role":"admin"	
 	}`))
-	r.Header.Set("Content-Type", "json")
-	r.Header.Set("User-Agent", "PostmanRuntime/7.29.2")
-	r.Header.Set("Accept", "*/*")
-	r.Header.Set("Connection", "keep-alive")
-	// vars:=make(map[string]string)
-	// vars["id"]="1"
-	// // mux.Vars(r)["id"] = "1"
-	// mux.SetURLVars(r,vars)
-	// ctx := r.Context()
-	// 	mux.SetURLVars(r, 0, 1)
-	// ctx = context.WithValue(ctx, httprouter.ParamsKey, httprouter.Params{
-	//     {"uuid", "some-uuid"},
-	// })
-	// r = r.WithContext(ctx)
 
+	r = mux.SetURLVars(r, map[string]string{
+		"id": "1",
+	})
 	w := httptest.NewRecorder()
 
 	userObj := user.UpdateUser{
@@ -62,16 +51,12 @@ func (suite *TestSuiteHandler) TestUpdateTicket() {
 		Email: "ayush12@gmail1.com",
 		Role:  "admin",
 	}
-	// mux.Vars()
+
 	t.Run("when user update success", func(t *testing.T) {
 		suite.SetupTest()
-		fmt.Println("call run")
-		err := suite.service.On("UpadateUser", r.Context(), userObj, "1").Return(nil)
-		fmt.Println(err, "error")
-		fmt.Println("this is call")
+		suite.service.On("UpadateUser", r.Context(), userObj, "1").Return(nil)
 		user.UpdateUserById(suite.service)(w, r)
-
-		fmt.Printf("%+v", w)
+		assert.Equal(t, http.StatusOK, w.Code)
 	})
 
 }
@@ -81,7 +66,11 @@ func (suite *TestSuiteHandler) TestList() {
 	url := "/users"
 	r := httptest.NewRequest(http.MethodGet, url, nil)
 	w := httptest.NewRecorder()
-	userli := []user.UserResp{{ID: "1", Name: "ayush", Email: "ayush", Role: "admin"}}
+	userli := []user.UserResp{{
+		ID:    "1",
+		Name:  "ayush",
+		Email: "ayush",
+		Role:  "admin"}}
 	userList := user.UserList{User: userli}
 
 	t.Run("user get list", func(t *testing.T) {

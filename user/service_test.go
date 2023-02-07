@@ -13,11 +13,6 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type testCreacteUser struct {
-	user user.UserCreate
-	err  error
-}
-
 type TestSuite struct {
 	suite.Suite
 	store   *mockDb.Storer
@@ -35,57 +30,7 @@ func (t *TestSuite) SetupTest() {
 	t.encrypt = &mocks.Encrypt{}
 }
 
-// func (suite *TestSuite) TearDownSuite() {
-// 	suite.store.AssertExpectations(suite.T())
-// 	suite.encrypt.AssertExpectations(suite.T())
-// }
-
-// func (suite *TestSuite) TestCreateUser(){
-// 	t := suite.T()
-// 	// ctx := context.Background()
-// 	// assert := assert.New(t)
-// 	// db := &mocks.Storer{}
-// 	// userService := NewUserService(db)
-// 	p:= "1234"
-// 	ancryptReal := NewEncrypt();
-// 	p1,_:= ancryptReal.HashPassword("1234")
-// 	fmt.Println(p1,"hash..............")
-// 	testUser := []testCreacteUser{
-// 		{user:UserCreate{Id:"12",Email:"ayush@gmail.com",Password:"1234",Role:"admin",Name:"ayu"},err:nil},
-// 		{user:UserCreate{Id:"12",Email:"ayush@gmail.com",Role:"admin",Name:"ayu"},err:ErrEmptyPassword},
-// 		{user:UserCreate{Id:"12",Email:"ayush@gmail.com",Password:p,Name:"ayu"},err:ErrEmptyRole},
-// 		{user:UserCreate{Id:"12",Email:"ayush@gmail.com",Password:p,Role:"admin"},err:ErrEmptyName},
-// 		{user:UserCreate{Id:"12",Password:p,Role:"admin",Name:"ayu"},err:ErrEmptyEmail},
-// 	}
-// 	// for _,item:=range(testUser){
-
-// 	// 	err := userService.CreateUser(ctx,item.user)
-// 	// 	db.On("CreateUser",ctx,mocks.Anything)
-
-// 	// }
-// 	ctx := context.Background()
-
-// 	item := testUser[0]
-// 		suite.SetTestSuit()
-
-// 		t.Run("when user creation success",func(t *testing.T) {
-// 		suite.encrypt.On("HashPassword",item.user.Password).Return(p1,nil)
-// 		suite.store.On("CreateUser",ctx,db.User{
-// 			Name:item.user.Name,
-// 			Email: item.user.Email,
-// 			Role: item.user.Role,
-// 			Password: p1,
-// 		  }).Return(nil)
-
-//         err:= suite.user.CreateUser(ctx,item.user)
-// 		fmt.Println(err)
-// 		assert.NoError(t,err)
-// 		suite.TearDownSuite()
-// 	})
-
-// }
-
-func (suite *TestSuite) TestUpadateUser() {
+func (suite *TestSuite) TestUpadateUserService() {
 	t := suite.T()
 	ctx := context.Background()
 	testUser := user.UpdateUser{Name: "Ayush", Email: "ayushjnv1@gmail.com", Role: "admin"}

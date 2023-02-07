@@ -18,11 +18,11 @@ func IsAmountSufficient(ctx context.Context, amount int, acc string, db db.Store
 }
 
 func IsLoginUserAccount(ctx context.Context, uid string, cutid string, db db.Storer) (f bool, err error) {
-	cust, err := db.GetAccount(ctx, cutid)
+	account, err := db.GetAccount(ctx, cutid)
 	if err != nil {
 		return false, err
 	}
-	if cust.UserID != uid {
+	if account.UserID != uid {
 		return false, err
 	}
 	return true, err

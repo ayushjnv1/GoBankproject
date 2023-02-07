@@ -5,11 +5,6 @@ import (
 	"net/http"
 )
 
-type SuccessResponse struct {
-	Message string      `json:"message,omitempty"`
-	Data    interface{} `json:"data",omitempty`
-}
-
 type Response struct {
 	Message string `json:"message"`
 }

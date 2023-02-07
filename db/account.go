@@ -55,7 +55,10 @@ func (s *store) DeleteAccount(ctx context.Context, accountID string) (account Ac
 	if err != nil {
 		return account, err
 	}
-	val, _ := res.RowsAffected()
+	val, err := res.RowsAffected()
+	if err != nil {
+		return account, err
+	}
 
 	if val == 0 {
 		return account, ErrUserNotExist

@@ -77,8 +77,8 @@ func (_m *Service) AmmountWithdraw(ctx context.Context, amount int, debitAcc str
 	return r0, r1
 }
 
-// Amounttransaction provides a mock function with given fields: ctx, transactionRequest, userID
-func (_m *Service) Amounttransaction(ctx context.Context, transactionRequest transaction.TransactionRequest, userID string) (int, error) {
+// AmountTransaction provides a mock function with given fields: ctx, transactionRequest, userID
+func (_m *Service) AmountTransaction(ctx context.Context, transactionRequest transaction.TransactionRequest, userID string) (int, error) {
 	ret := _m.Called(ctx, transactionRequest, userID)
 
 	var r0 int

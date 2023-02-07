@@ -3,13 +3,11 @@ package transaction
 import (
 	"context"
 	"database/sql"
-	"fmt"
-
 	"github.com/ayushjnv1/Gobank/db"
 )
 
 type Service interface {
-	Amounttransaction(ctx context.Context, transactionRequest TransactionRequest, userID string) (amountRemaining int, err error)
+	AmountTransaction(ctx context.Context, transactionRequest TransactionRequest, userID string) (amountRemaining int, err error)
 	AmmountWithdraw(ctx context.Context, amount int, debitAcc string) (amountRemaining int, err error)
 	AmmountDeposit(ctx context.Context, amount int, creditAcc string) (amountRemaining int, err error)
 	AllTransactions(ctx context.Context) (list TransactionListResponse, err error)
@@ -19,7 +17,7 @@ type transactionService struct {
 	db db.Storer
 }
 
-func (ts *transactionService) Amounttransaction(ctx context.Context, transactionRequest TransactionRequest, userId string) (amountRemaining int, err error) {
+func (ts *transactionService) AmountTransaction(ctx context.Context, transactionRequest TransactionRequest, userId string) (amountRemaining int, err error) {
 	isSufficient, err := IsAmountSufficient(ctx, transactionRequest.Amount, transactionRequest.DebitAcc, ts.db)
 	if err != nil {
 		return
@@ -35,11 +33,13 @@ func (ts *transactionService) Amounttransaction(ctx context.Context, transaction
 	if !isAllow {
 		return amountRemaining, ErrUnAuthorize
 	}
+
 	transactionDb := db.TransactionStruct{
 		Amount:    transactionRequest.Amount,
 		CreditAcc: sql.NullString{String: transactionRequest.CreditAcc, Valid: true},
 		DebitAcc:  sql.NullString{String: transactionRequest.DebitAcc, Valid: true},
 	}
+
 	err = ts.db.Amounttransaction(ctx, transactionDb)
 	if err != nil {
 		return
@@ -77,24 +77,24 @@ func (ts *transactionService) AmmountDeposit(ctx context.Context, amount int, de
 }
 
 func (ts *transactionService) AllTransactions(ctx context.Context) (list TransactionListResponse, err error) {
-	listdbO, err := ts.db.AllTransactionList(ctx)
+	listdb, err := ts.db.AllTransactionList(ctx)
 	if err != nil {
 		return
 	}
 
-	listTrans := []TransactionResponse{}
+	transactions := []TransactionResponse{}
 
-	for _, item := range listdbO {
+	for _, item := range listdb {
 		txn := TransactionResponse{}
 		txn.Amount = item.Amount
 		txn.CreditAcc = item.CreditAcc.String
 		txn.DebitAcc = item.DebitAcc.String
 		txn.TransationAt = item.TransactionAt
 		txn.Type = item.Type
-		listTrans = append(listTrans, txn)
+		transactions = append(transactions, txn)
 	}
-	fmt.Println(listTrans[0].TransationAt)
-	list.List = listTrans
+
+	list.List = transactions
 	return
 }
 

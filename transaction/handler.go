@@ -7,7 +7,6 @@ import (
 	"github.com/ayushjnv1/Gobank/api"
 )
 
-// ayush: reaname WithdrawAmount
 func WithdrawAmount(service Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var transReq TransactionRequest
@@ -30,16 +29,17 @@ func DepositAmount(service Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var transReq TransactionRequest
 		err := json.NewDecoder(r.Body).Decode(&transReq)
-
 		if err != nil {
 			api.Error(w, http.StatusBadRequest, api.Response{Message: err.Error()})
 			return
 		}
+
 		amount, err := service.AmmountDeposit(r.Context(), transReq.Amount, transReq.CreditAcc)
 		if err != nil {
 			api.Error(w, http.StatusBadRequest, api.Response{Message: err.Error()})
 			return
 		}
+
 		api.Success(w, http.StatusAccepted, TrnasactionResponse{Amount: amount, Message: "amount deposite successful"})
 	}
 }
@@ -60,7 +60,7 @@ func InitiateTransaction(service Service) http.HandlerFunc {
 
 		id := r.Header.Get("id")
 
-		amount, err := service.Amounttransaction(r.Context(), transactionRequest, id)
+		amount, err := service.AmountTransaction(r.Context(), transactionRequest, id)
 		if err != nil {
 			api.Error(w, http.StatusBadRequest, api.Response{Message: err.Error()})
 			return
